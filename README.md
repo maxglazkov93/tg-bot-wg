@@ -32,23 +32,32 @@ pip install -r requirements.txt
 
 ### 2. Настройка конфигурации
 
-Отредактируйте файл `config.py`:
+Скопируйте пример файла конфигурации и заполните своими данными:
 
-```python
-# Измените PIN-код на свой (6 цифр)
-ACCESS_PIN = "123456"  # Замените на свой PIN
+```bash
+cp api_token.txt.example api_token.txt
+```
 
-# Настройки вашего WireGuard сервера
-WG_SERVER_IP = "5.129.213.216"  # IP вашего сервера
-WG_SERVER_PORT = 65338  # Порт WireGuard
-WG_SERVER_PUBLIC_KEY = "your_server_public_key"  # Публичный ключ сервера
-WG_SERVER_PRIVATE_KEY = "your_server_private_key"  # Приватный ключ сервера
+Отредактируйте файл `api_token.txt`:
+
+```bash
+# Токен Telegram бота
+token = YOUR_BOT_TOKEN_HERE
+
+# PIN код для доступа (6 цифр)
+ACCESS_PIN = 123456
+
+# WireGuard сервер настройки
+WG_SERVER_IP = YOUR_SERVER_IP_HERE
+WG_SERVER_PORT = 65338
+SERVER_PUB_KEY = YOUR_SERVER_PUBLIC_KEY_HERE
+SERVER_PRIV_KEY = YOUR_SERVER_PRIVATE_KEY_HERE
 
 # SSH настройки
-SSH_HOST = "5.129.213.216"
+SSH_HOST = YOUR_SERVER_IP_HERE
 SSH_PORT = 22
-SSH_USERNAME = "root"  # или ваш пользователь
-SSH_PASSWORD = "your_password"  # или путь к SSH ключу
+SSH_USERNAME = root
+SSH_PASSWORD = YOUR_SSH_PASSWORD_HERE
 ```
 
 ### 3. Проверка WireGuard сервера
@@ -94,12 +103,14 @@ python bot.py
 
 ```
 tg_bot_my_serv/
-├── bot.py              # Основной файл бота
-├── wireguard_manager.py # Модуль управления WireGuard
-├── config.py           # Конфигурация
-├── requirements.txt    # Зависимости Python
-├── README.md          # Документация
-└── api_token.txt      # Токен бота (уже есть)
+├── bot.py                    # Основной файл бота
+├── wireguard_manager.py      # Модуль управления WireGuard
+├── config.py                 # Конфигурация
+├── requirements.txt          # Зависимости Python
+├── README.md                # Документация
+├── api_token.txt.example    # Пример конфигурации
+├── api_token.txt            # Конфигурация (не в git)
+└── setup_server.sh          # Скрипт настройки сервера
 ```
 
 ## 🔐 Безопасность
