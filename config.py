@@ -25,13 +25,13 @@ BOT_TOKEN = config_data.get('token', '').replace('token = ', '')
 ACCESS_PIN = config_data.get('ACCESS_PIN', '123456')  # Измените на свой PIN
 
 # WireGuard сервер настройки
-WG_SERVER_IP = config_data.get('WG_SERVER_IP', '5.129.213.216')  # Внешний IP сервера
+WG_SERVER_IP = config_data.get('WG_SERVER_IP', 'YOUR_SERVER_IP')  # Внешний IP сервера
 WG_SERVER_PORT = int(config_data.get('WG_SERVER_PORT', '65338'))  # Порт WireGuard
 WG_SERVER_PUBLIC_KEY = config_data.get('SERVER_PUB_KEY', '')  # Публичный ключ сервера
 WG_SERVER_PRIVATE_KEY = config_data.get('SERVER_PRIV_KEY', '')  # Приватный ключ сервера
 
 # SSH настройки для подключения к серверу
-SSH_HOST = config_data.get('SSH_HOST', '5.129.213.216')
+SSH_HOST = config_data.get('SSH_HOST', 'YOUR_SERVER_IP')
 SSH_PORT = int(config_data.get('SSH_PORT', '22'))
 SSH_USERNAME = config_data.get('SSH_USERNAME', 'root')  # или ваш пользователь
 SSH_PASSWORD = config_data.get('SSH_PASSWORD', 'your_password')  # или путь к SSH ключу
