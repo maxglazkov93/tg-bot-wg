@@ -3,7 +3,7 @@ import tempfile
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
-from wireguard_manager import WireGuardManagerLocal
+from wireguard_manager import WireGuardManager
 from config import BOT_TOKEN, ACCESS_PIN
 
 # Настройка логирования
@@ -18,7 +18,7 @@ user_states = {}
 
 class WireGuardBot:
     def __init__(self):
-        self.wg_manager = WireGuardManagerLocal()
+        self.wg_manager = WireGuardManager()
         
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработчик команды /start"""

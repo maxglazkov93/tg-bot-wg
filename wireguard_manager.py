@@ -221,3 +221,80 @@ AllowedIPs = {client_ip}/32
             return client_config, None
         except Exception as e:
             return None, f"Ошибка создания конфигурации: {e}" 
+
+class WireGuardManagerLocal:
+    def __init__(self):
+        pass
+
+    def generate_key_pair(self):
+        return WireGuardManager().generate_key_pair()
+
+    def create_client_config(self, client_name, client_private_key, client_public_key, client_ip, client_ipv6=None):
+        return WireGuardManager().create_client_config(client_name, client_private_key, client_public_key, client_ip, client_ipv6)
+
+    def check_client_name_exists(self, client_name):
+        path = os.path.join(WG_CLIENTS_DIR, f"{client_name}.conf")
+        return os.path.isfile(path)
+
+    def get_next_client_ip(self):
+        used_octets = []
+        used_ipv6 = []
+        if not os.path.isdir(WG_CLIENTS_DIR):
+            os.makedirs(WG_CLIENTS_DIR)
+        for fname in os.listdir(WG_CLIENTS_DIR):
+            if fname.endswith('.conf'):
+                with open(os.path.join(WG_CLIENTS_DIR, fname), 'r') as f:
+                    for line in f:
+                        if line.startswith('Address = '):
+                            ips = line.split('=')[1].strip().split(',')
+                            for ip in ips:
+                                ip = ip.strip().split('/')[0]
+                                if ip.startswith('10.66.66.'):
+                                    try:
+                                        octet = int(ip.split('.')[-1])
+                                        used_octets.append(octet)
+                                    except Exception:
+                                        pass
+                                elif ip.startswith('fd42:42:42:1::'):
+                                    try:
+                                        n = int(ip.split('::')[-1])
+                                        used_ipv6.append(n)
+                                    except Exception:
+                                        pass
+        next_octet = max(used_octets) + 1 if used_octets else 2
+        if next_octet > 254:
+            return None, None
+        next_ipv4 = f"10.66.66.{next_octet}"
+        next_ipv6 = f"fd42:42:42:1::{next_octet}"
+        return next_ipv4, next_ipv6
+
+    def add_client_to_server(self, client_name, client_public_key, client_ip, client_private_key):
+        # Создаем конфиг клиента
+        client_config = self.create_client_config(client_name, client_private_key, client_public_key, client_ip)
+        client_config_path = os.path.join(WG_CLIENTS_DIR, f"{client_name}.conf")
+        with open(client_config_path, 'w') as f:
+            f.write(client_config)
+        # Добавляем peer в серверный конфиг
+        peer_config = f"\n\n# Client: {client_name}\n[Peer]\nPublicKey = {client_public_key}\nAllowedIPs = {client_ip}/32\n"
+        with open(WG_CONFIG_PATH, 'a') as f:
+            f.write(peer_config)
+        # Перезапуск wg
+        try:
+            subprocess.run(["wg-quick", "down", WG_INTERFACE], check=True)
+        except Exception:
+            pass  # если не поднят, игнорируем
+        subprocess.run(["wg-quick", "up", WG_INTERFACE], check=True)
+        return True
+
+    def create_and_deploy_config(self, client_name):
+        try:
+            private_key, public_key = self.generate_key_pair()
+            client_ip, client_ipv6 = self.get_next_client_ip()
+            if not client_ip:
+                return None, "Не удалось получить IP адрес"
+            client_config = self.create_client_config(client_name, private_key, public_key, client_ip, client_ipv6)
+            if not self.add_client_to_server(client_name, public_key, client_ip, private_key):
+                return None, "Не удалось добавить клиента на сервер"
+            return client_config, None
+        except Exception as e:
+            return None, f"Ошибка создания конфигурации: {e}" 
